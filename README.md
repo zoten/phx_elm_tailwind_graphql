@@ -39,7 +39,15 @@ mix setup
 iex -S phx.server
 ```
 
-## Changes until now
+## Milestones
+
+Since this is an example project, there are a few notable milestones in building it that are identified by tags
+
+ - Step 1 [phoenix_elm](https://github.com/zoten/phx_elm_tailwind_graphql/releases/tag/phoenix_elm): simply have a phoenix application that serves an Elm counter
+ - Step 2 [phoenix_elm_tailwind ](https://github.com/zoten/phx_elm_tailwind_graphql/releases/tag/phoenix_elm_tailwind): add a super basic tailwind support
+ - Step 3 [phoenix_elm_tailwind_sass](https://github.com/zoten/phx_elm_tailwind_graphql/releases/tag/phoenix_elm_tailwind_sass ): add a SASS precompilation step before tailwind, to support more powerful semantics (e.g. nested styles)
+
+## Notable Changes
 
 [See also](https://hexdocs.pm/phoenix/asset_management.html#content)
 [See also](https://pragmaticstudio.com/tutorials/adding-tailwind-css-to-phoenix)
@@ -116,3 +124,8 @@ iex -S phx.server
   - Add DartSass support (to support nested styles) [source post](https://pragmaticstudio.com/tutorials/adding-tailwind-css-to-phoenix)
     - Make the CSS creation a two step pipeline (SASS + Tailwind)
     - Unluckily, need to add a `mix setup` call before first run, otherwise a needed file will not be found
+
+## TODO
+
+ - [ ] check if production build is working 😶
+ - [ ] get rid of self generated assets/css/app.css file 🤨

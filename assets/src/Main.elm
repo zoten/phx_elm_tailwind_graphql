@@ -44,6 +44,7 @@ view model =
     div [ class "grid m-4" ]
         [ h1 [ class "flex justify-center font-bold text-4xl text-yellow-500" ] [ text "Elm and Tailwind CSS" ]
         , div [ class "flex justify-center" ] [ viewCounter model ]
+        , div [ class "flex justify-center" ] [ viewCard model ]
         , div [ class "flex justify-center" ] [ a [ href "https://github.com/zoten/phx_elm_tailwind_graphql" ] [ text "https://github.com/zoten/phx_elm_tailwind_graphql" ] ]
         ]
 
@@ -56,4 +57,21 @@ viewCounter model =
         , button [ class "btn m-4", onClick Increment ] [ text "+" ]
         , button [ class "btn m-4", onClick Reset ] [ text "R" ]
         ]
+
+viewCard : Model -> Html.Html Msg
+viewCard model =
+    div
+        [class "card"]
+        [
+            div
+                [class "title"]
+                [text "Phoenix + Tailwind"],
+            div
+                [class "description"]
+                [
+                    text "A fiery wind at your back?",
+                    a [ href "#" ] [text "click"]
+                ]
+        ]
+
 

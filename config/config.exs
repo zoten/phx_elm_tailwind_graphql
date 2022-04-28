@@ -38,13 +38,25 @@ config :swoosh, :api_client, false
 #     cd: Path.expand("../assets", __DIR__),
 #     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
 #   ]
+
+# CSS pipeline
+
+# This uses your assets/css/app.scss as the input file and drops the compiled CSS into the priv/static/assets/app.tailwind.css file.
+# That’ll be the first stage of the CSS build process.
+config :dart_sass,
+  version: "1.49.11",
+  default: [
+    args: ~w(css/app.scss ../priv/static/assets/app.tailwind.css),
+    cd: Path.expand("../assets", __DIR__)
+  ]
 # Configure tailwind
+# before SASS was --input=css/app.css
 config :tailwind,
-  version: "3.0.10",
+  version: "3.0.24",
   default: [
     args: ~w(
       --config=tailwind.config.js
-      --input=css/app.css
+      --input=../priv/static/assets/app.tailwind.css
       --output=../priv/static/assets/app.css
     ),
     cd: Path.expand("../assets", __DIR__)

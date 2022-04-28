@@ -1,9 +1,33 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+// @import "tailwindcss/base";
+// @import "tailwindcss/components";
+// @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
 /* @import "./phoenix.css"; */
+
+.btn {
+  @apply px-4 py-1 bg-blue-600 text-white rounded;
+}
+
+// Example of a card with nested styles
+.card {
+  @apply p-4 bg-blue-200 text-blue-800 rounded-lg;
+
+  & .title {
+    @apply text-2xl tracking-tight font-bold;
+  }
+
+  & .description {
+    @apply pt-4 text-lg font-medium;
+
+    & a {
+      @apply underline text-blue-600;
+    }
+  }
+}
 
 /* Alerts and form errors used by phx.new */
 /*

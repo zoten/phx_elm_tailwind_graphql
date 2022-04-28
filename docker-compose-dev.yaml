@@ -1,0 +1,29 @@
+# Docker compose for development
+
+version: "3.7"
+
+services:
+  postgres0:
+    image: postgres:14
+    restart: always
+    networks:
+      - db
+    ports:
+      - 5432:5432
+    volumes:
+      - ${PWD}/data/dbs/pg_data0:/var/lib/postgresql/data
+    environment:
+      #- POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+
+  adminer:
+    image: adminer:4.8.1-standalone
+    restart: always
+    ports:
+      - 8432:8080
+
+networks:
+  db:
+    driver: bridge

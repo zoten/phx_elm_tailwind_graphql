@@ -66,3 +66,16 @@ This is not for any production use.
 
     ```
 
+  - Steps are:
+    - Add to [`mix.exs`](./mix.exs) the tailwind dependency
+      ``` elixir
+      # ...
+      {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
+      ```
+    - Add tailwind imports to [`assets/css/app.css`](./assets/css/app.css)
+    - Remove phoenix.css and comment out its own classes from [`assets/css/app.css`](./assets/css/app.css)
+    - Remove app.css import from [`assets/js/app.js`](./assets/js/app.js)
+    - Add [`assets/tailwind.config.js`](./assets/tailwind.config.js) (probably optional if you configure accordingly)
+    - Configure tailwind in [`config/config.exs`](./config/config.exs)
+    - Configure watchers in [`config/dev.exs`](./config/dev.exs) for development
+    - use CSS in layout or wherever is needed, as in [lib/scmp_web/templates/layout/root.html.heex](lib/scmp_web/templates/layout/root.html.heex)

@@ -66,7 +66,7 @@ This is not for any production use.
 
     ```
 
-  - Steps are:
+  - Steps are (see [commit](https://github.com/zoten/phx_elm_tailwind_graphql/commit/a1c01d1cee61e75c4662b4ac1065f1d92bdc4af0)):
     - Add to [`mix.exs`](./mix.exs) the tailwind dependency
       ``` elixir
       # ...

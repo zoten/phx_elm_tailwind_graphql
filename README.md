@@ -36,7 +36,7 @@ Said that, this project is about this cases where you accept challenges and limi
 ``` bash
 ./start-compose-dev.sh
 mix setup
-iex -S phx.server
+iex -S mix phx.server
 ```
 
 ## Milestones

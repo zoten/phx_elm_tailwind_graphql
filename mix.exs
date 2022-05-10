@@ -42,6 +42,11 @@ defmodule Scmp.MixProject do
       {:phoenix_live_view, "~> 0.17.5"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.6"},
+      # GraphQL backend
+      {:absinthe, "~> 1.7"},
+      {:absinthe_phoenix, "~> 2.0"},
+      #  Absinthe's dataloader
+      {:dataloader, "~> 1.0.0"},
       # Tailwind and SASS Elixir helpers
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
       {:dart_sass, "~> 0.4", runtime: Mix.env() == :dev},
@@ -68,12 +73,12 @@ defmodule Scmp.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.build": [
-        #"esbuild default",
+        # "esbuild default",
         "cmd --cd assets node build.js",
         "sass default",
         "tailwind default"
       ],
-      #"assets.deploy": ["esbuild default --minify", "phx.digest"]
+      # "assets.deploy": ["esbuild default --minify", "phx.digest"]
       "assets.deploy": [
         "cmd --cd assets node build.js --deploy",
         "sass default",

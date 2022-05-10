@@ -14,6 +14,13 @@ defmodule ScmpWeb.Router do
     plug :accepts, ["json"]
   end
 
+  forward "/api", Absinthe.Plug, schema: ScmpWeb.Schema
+
+  forward "/graphiql",
+          Absinthe.Plug.GraphiQL,
+          schema: Scmp.Schema,
+          interface: :simple
+
   scope "/", ScmpWeb do
     pipe_through :browser
 

@@ -2,6 +2,7 @@ defmodule Scmp.Schema.AccountTypes do
   @moduledoc false
   use Absinthe.Schema.Notation
   import Absinthe.Resolution.Helpers, only: [dataloader: 1]
+  import_types(Absinthe.Type.Custom)
 
   # GraphQL "object type"
   object :club do
@@ -12,5 +13,6 @@ defmodule Scmp.Schema.AccountTypes do
 
   object :user do
     field :name, :string
+    field :inserted_at, :naive_datetime
   end
 end

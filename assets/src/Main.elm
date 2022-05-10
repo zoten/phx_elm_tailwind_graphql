@@ -4,6 +4,7 @@ import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Page.EditPost as EditPost
+import Page.ListClubs as ListClubs
 import Page.ListPosts as ListPosts
 import Page.NewPost as NewPost
 import Route exposing (Route)
@@ -34,10 +35,17 @@ type Page
     | ListPage ListPosts.Model
     | EditPage EditPost.Model
     | NewPage NewPost.Model
+    | ListClubsPage ListClubs.Model
+
+
+
+-- | EditPage EditPost.Model
+-- | NewPage NewPost.Model
 
 
 type Msg
     = ListPageMsg ListPosts.Msg
+    | ListClubsPageMsg ListClubs.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | EditPageMsg EditPost.Msg
@@ -84,6 +92,13 @@ initCurrentPage ( model, existingCmds ) =
                             NewPost.init model.navKey
                     in
                     ( NewPage pageModel, Cmd.map NewPageMsg pageCmd )
+
+                Route.Clubs ->
+                    let
+                        ( clubModel, pageCmds ) =
+                            ListClubs.init
+                    in
+                    ( ListClubsPage clubModel, Cmd.map ListClubsPageMsg pageCmds )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -92,7 +107,7 @@ initCurrentPage ( model, existingCmds ) =
 
 view : Model -> Document Msg
 view model =
-    { title = "Post App"
+    { title = "Scmp App"
     , body = [ currentView model ]
     }
 
@@ -114,6 +129,10 @@ currentView model =
         NewPage pageModel ->
             NewPost.view pageModel
                 |> Html.map NewPageMsg
+
+        ListClubsPage pageModel ->
+            ListClubs.view pageModel
+                |> Html.map ListClubsPageMsg
 
 
 notFoundView : Html msg
@@ -169,6 +188,15 @@ update msg model =
             in
             ( { model | page = NewPage updatedPageModel }
             , Cmd.map NewPageMsg updatedCmd
+            )
+
+        ( ListClubsPageMsg subMsg, ListClubsPage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    ListClubs.update subMsg pageModel
+            in
+            ( { model | page = ListClubsPage updatedPageModel }
+            , Cmd.map ListClubsPageMsg updatedCmd
             )
 
         ( _, _ ) ->

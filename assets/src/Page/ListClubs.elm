@@ -1,9 +1,11 @@
 module Page.ListClubs exposing (Model, Msg, init, update, view)
 
-import API.CustomCodecs exposing (Id)
+--import API.CustomCodecs exposing (Id)
+
 import API.Scmp.Object
 import API.Scmp.Object.Club
 import API.Scmp.Query as Query
+import API.Scmp.Scalar exposing (Id(..))
 import Club exposing (Club, ClubId, clubsDecoder)
 import Error exposing (buildErrorMessage)
 import Graphql.Http
@@ -184,14 +186,14 @@ viewTableHeader =
         ]
 
 
-fromJust : Maybe a -> a -> a
-fromJust x default =
-    case x of
-        Just y ->
-            y
+getClubId : Maybe Id -> String
+getClubId clubId =
+    case clubId of
+        Just (Id id) ->
+            id
 
         Nothing ->
-            default
+            "--"
 
 
 viewClub : Maybe Club -> Html Msg
@@ -204,10 +206,10 @@ viewClub maybeclub =
     case maybeclub of
         Just club ->
             tr []
-                [ --  td []
-                  -- [ text (Club.idToString (fromJust club.id 0)) ],
-                  td []
-                    [ text (fromJust club.name "--") ]
+                [ td []
+                    [ text (getClubId club.id) ]
+                , td []
+                    [ text (Maybe.withDefault "--" club.name) ]
                 , td []
                     [ a [ href clubPath ] [ text "Edit" ] ]
 

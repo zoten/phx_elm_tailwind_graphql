@@ -1,5 +1,6 @@
-module Error exposing (buildErrorMessage)
+module Error exposing (buildErrorMessage, hackBuildErrorMessage)
 
+import Graphql.Http
 import Http
 
 
@@ -20,3 +21,22 @@ buildErrorMessage httpError =
 
         Http.BadBody message ->
             message
+
+
+hackBuildErrorMessage : Graphql.Http.RawError parsedData Http.Error -> String
+hackBuildErrorMessage httpError =
+    case httpError of
+        Graphql.Http.BadUrl message ->
+            message
+
+        Graphql.Http.Timeout ->
+            "Server is taking too long to respond. Please try again later."
+
+        Graphql.Http.NetworkError ->
+            "Unable to reach server."
+
+        Graphql.Http.BadStatus _ message ->
+            "Request failed with status code: " ++ message
+
+        Graphql.Http.BadPayload _ ->
+            "Bad payload"

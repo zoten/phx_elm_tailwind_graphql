@@ -4,8 +4,6 @@ defmodule ScmpWeb.Resolvers.Accounts.User do
   """
 
   def find_user(_parent, %{id: id}, _resolution) do
-    IO.inspect(id)
-
     case Scmp.Accounts.get_user(id) do
       {:error, :not_found} ->
         {:error, "User ID #{id} not found"}

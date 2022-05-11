@@ -8,6 +8,7 @@ Showcase to see how Elixir+Phoenix, Elm, GraphQL and TailwindCSS may (opinionate
 
  * This is not for any production use.
  * I know really few about build pipelines for the modern web. There are surely way better ways to do the frontend stitching
+ * dev port is hardcoded to 4000. This number is hardcoded in the web app and in some dev scripts. Forwarding of this port's configuration is left as an exercise to the reader (aka I'm lazy and this is out of scope, please free your port 4000 before running stuff here :) )
 
 ### Opinionated disclaimer
 
@@ -37,6 +38,14 @@ Said that, this project is about this cases where you accept challenges and limi
 ./start-compose-dev.sh
 mix setup
 iex -S mix phx.server
+```
+
+### Re-Generate APIs
+
+With the dev server running on port 4000, run
+
+``` bash
+npm run generate:api
 ```
 
 ## Milestones

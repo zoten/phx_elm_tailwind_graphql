@@ -1,5 +1,11 @@
 {
+  "name": "scmp",
+  "version": "0.1.0",
+  "scripts": {
+    "generate:api": "elm-graphql http://localhost:4000/api --base API.Scmp --scalar-codecs API.CustomCodecs --output src"
+  },
   "devDependencies": {
+    "@dillonkearns/elm-graphql": "^4.2.4",
     "esbuild": "^0.14.38",
     "esbuild-plugin-elm": "^0.0.8"
   },

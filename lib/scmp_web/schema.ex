@@ -1,7 +1,7 @@
-defmodule Scmp.Schema do
+defmodule ScmpWeb.Schema do
   use Absinthe.Schema
 
-  import_types(Scmp.Schema.AccountTypes)
+  import_types(ScmpWeb.Schema.AccountTypes)
 
   query do
     @desc "Get a list of all clubs"

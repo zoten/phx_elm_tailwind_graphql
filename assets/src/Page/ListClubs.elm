@@ -1,26 +1,45 @@
 module Page.ListClubs exposing (Model, Msg, init, update, view)
 
+import API.CustomCodecs exposing (Id)
+import API.Scmp.Object
+import API.Scmp.Object.Club
+import API.Scmp.Query as Query
 import Club exposing (Club, ClubId, clubsDecoder)
-import Error exposing (buildErrorMessage)
+import Error exposing (buildErrorMessage, hackBuildErrorMessage)
+import Graphql.Http
+import Graphql.Http.GraphqlError
+import Graphql.Operation exposing (RootQuery)
+import Graphql.SelectionSet as SelectionSet exposing (SelectionSet)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Http
-import Json.Decode as Decode
-import RemoteData exposing (WebData)
+import RemoteData exposing (RemoteData, WebData)
 
 
 type alias Model =
-    { clubs : WebData (List Club)
+    { clubs : RemoteData (Graphql.Http.Error Clubs) Clubs
     , deleteError : Maybe String
     }
 
 
+type alias Club =
+    { id : Maybe Id
+    , name : Maybe String
+    }
+
+
+type alias Clubs =
+    Maybe (List (Maybe Club))
+
+
 type Msg
     = FetchClubs
-    | ClubsReceived (WebData (List Club))
-    | DeleteClub ClubId
-    | ClubDeleted (Result Http.Error String)
+    | ClubsReceived (RemoteData (Graphql.Http.Error Clubs) Clubs)
+
+
+
+-- | DeleteClub ClubId
+-- | ClubDeleted (Result Http.Error String)
 
 
 init : ( Model, Cmd Msg )
@@ -35,14 +54,46 @@ initialModel =
     }
 
 
+fetchClubsQuery : SelectionSet Clubs RootQuery
+fetchClubsQuery =
+    Query.clubs clubListSelection
+
+
+clubListSelection : SelectionSet Club API.Scmp.Object.Club
+clubListSelection =
+    SelectionSet.map2 Club
+        API.Scmp.Object.Club.id
+        API.Scmp.Object.Club.name
+
+
+makeGraphQLQuery : SelectionSet decodesTo RootQuery -> (Result (Graphql.Http.Error decodesTo) decodesTo -> msg) -> Cmd msg
+makeGraphQLQuery query decodesTo =
+    query
+        |> Graphql.Http.queryRequest "http://localhost:4000/api"
+        |> Graphql.Http.send decodesTo
+
+
 fetchClubs : Cmd Msg
 fetchClubs =
-    Http.get
-        { url = "http://localhost:4000/clubs/"
-        , expect =
-            clubsDecoder
-                |> Http.expectJson (RemoteData.fromResult >> ClubsReceived)
-        }
+    makeGraphQLQuery fetchClubsQuery
+        (RemoteData.fromResult >> ClubsReceived)
+
+
+
+-- (RemoteData.fromResult
+--     >> ClubsReceived
+-- )
+-- (Graphql.Http.parseableErrorAsSuccess
+--     >> Graphql.Http.withSimpleHttpError
+-- (RemoteData.fromResult
+--     >> ClubsReceived
+-- )
+-- Http.get
+--     { url = "http://localhost:4000/clubs/"
+--     , expect =
+--         clubsDecoder
+--             |> Http.expectJson (RemoteData.fromResult >> ClubsReceived)
+--     }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -54,32 +105,27 @@ update msg model =
         ClubsReceived response ->
             ( { model | clubs = response }, Cmd.none )
 
-        DeleteClub clubId ->
-            ( model, deleteClub clubId )
-
-        ClubDeleted (Ok _) ->
-            ( model, fetchClubs )
-
-        ClubDeleted (Err error) ->
-            ( { model | deleteError = Just (buildErrorMessage error) }
-            , Cmd.none
-            )
 
 
-deleteClub : ClubId -> Cmd Msg
-deleteClub clubId =
-    Http.request
-        { method = "DELETE"
-        , headers = []
-        , url = "http://localhost:4000/clubs/" ++ Club.idToString clubId
-        , body = Http.emptyBody
-        , expect = Http.expectString ClubDeleted
-        , timeout = Nothing
-        , tracker = Nothing
-        }
-
-
-
+-- DeleteClub clubId ->
+--     ( model, deleteClub clubId )
+-- ClubDeleted (Ok _) ->
+--     ( model, fetchClubs )
+-- ClubDeleted (Err error) ->
+--     ( { model | deleteError = Just (buildErrorMessage error) }
+--     , Cmd.none
+--     )
+-- deleteClub : ClubId -> Cmd Msg
+-- deleteClub clubId =
+--     Http.request
+--         { method = "DELETE"
+--         , headers = []
+--         , url = "http://localhost:4000/clubs/" ++ Club.idToString clubId
+--         , body = Http.emptyBody
+--         , expect = Http.expectString ClubDeleted
+--         , timeout = Nothing
+--         , tracker = Nothing
+--         }
 -- VIEWS
 
 
@@ -97,9 +143,9 @@ view model =
         ]
 
 
-viewClubs : WebData (List Club) -> Html Msg
-viewClubs clubs =
-    case clubs of
+viewClubs : RemoteData (Graphql.Http.Error Clubs) Clubs -> Html Msg
+viewClubs clubsResponse =
+    case clubsResponse of
         RemoteData.NotAsked ->
             text ""
 
@@ -110,11 +156,16 @@ viewClubs clubs =
             div []
                 [ h3 [] [ text "Clubs" ]
                 , table []
-                    ([ viewTableHeader ] ++ List.map viewClub actualClubs)
+                    (viewTableHeader :: List.map viewClub actualClubs)
                 ]
 
-        RemoteData.Failure httpError ->
-            viewFetchError (buildErrorMessage httpError)
+        --RemoteData.Failure httpError ->
+        --viewFetchError (buildErrorMessage httpError)
+        RemoteData.Failure _ ->
+            viewFetchError "HTTP Error"
+
+        _ ->
+            viewFetchError "Generic fetch error"
 
 
 viewTableHeader : Html Msg
@@ -123,29 +174,39 @@ viewTableHeader =
         [ th []
             [ text "ID" ]
         , th []
-            [ text "Title" ]
-        , th []
-            [ text "Author" ]
+            [ text "Name" ]
         ]
+
+
+fromJust : Maybe a -> a -> a
+fromJust x default =
+    case x of
+        Just y ->
+            y
+
+        Nothing ->
+            default
 
 
 viewClub : Club -> Html Msg
 viewClub club =
     let
         clubPath =
-            "/clubs/" ++ Club.idToString club.id
+            --"/clubs/" ++ Club.idToString (fromJust club.id (Id 0))
+            "/clubs/fixme"
     in
     tr []
-        [ td []
-            [ text (Club.idToString club.id) ]
-        , td []
-            [ text club.name ]
+        [ --  td []
+          -- [ text (Club.idToString (fromJust club.id 0)) ],
+          td []
+            [ text (fromJust club.name "--") ]
         , td []
             [ a [ href clubPath ] [ text "Edit" ] ]
-        , td []
-            [ button [ type_ "button", onClick (DeleteClub club.id) ]
-                [ text "Delete" ]
-            ]
+
+        -- , td []
+        --     [ button [ type_ "button", onClick (DeleteClub club.id) ]
+        --         [ text "Delete" ]
+        --     ]
         ]
 
 

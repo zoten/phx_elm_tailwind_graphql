@@ -18,7 +18,7 @@ defmodule ScmpWeb.Router do
 
   forward "/graphiql",
           Absinthe.Plug.GraphiQL,
-          schema: Scmp.Schema,
+          schema: ScmpWeb.Schema,
           interface: :simple
 
   scope "/", ScmpWeb do

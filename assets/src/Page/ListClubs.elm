@@ -5,7 +5,7 @@ import API.Scmp.Object
 import API.Scmp.Object.Club
 import API.Scmp.Query as Query
 import Club exposing (Club, ClubId, clubsDecoder)
-import Error exposing (buildErrorMessage, hackBuildErrorMessage)
+import Error exposing (buildErrorMessage)
 import Graphql.Http
 import Graphql.Http.GraphqlError
 import Graphql.Operation exposing (RootQuery)
@@ -153,19 +153,25 @@ viewClubs clubsResponse =
             h3 [] [ text "Loading..." ]
 
         RemoteData.Success actualClubs ->
+            let
+                content =
+                    case actualClubs of
+                        Just clubs ->
+                            viewTableHeader :: List.map viewClub clubs
+
+                        Nothing ->
+                            [ p [] [ text "Nothing to show" ] ]
+            in
             div []
                 [ h3 [] [ text "Clubs" ]
                 , table []
-                    (viewTableHeader :: List.map viewClub actualClubs)
+                    content
                 ]
 
         --RemoteData.Failure httpError ->
         --viewFetchError (buildErrorMessage httpError)
         RemoteData.Failure _ ->
             viewFetchError "HTTP Error"
-
-        _ ->
-            viewFetchError "Generic fetch error"
 
 
 viewTableHeader : Html Msg
@@ -188,26 +194,31 @@ fromJust x default =
             default
 
 
-viewClub : Club -> Html Msg
-viewClub club =
+viewClub : Maybe Club -> Html Msg
+viewClub maybeclub =
     let
         clubPath =
             --"/clubs/" ++ Club.idToString (fromJust club.id (Id 0))
             "/clubs/fixme"
     in
-    tr []
-        [ --  td []
-          -- [ text (Club.idToString (fromJust club.id 0)) ],
-          td []
-            [ text (fromJust club.name "--") ]
-        , td []
-            [ a [ href clubPath ] [ text "Edit" ] ]
+    case maybeclub of
+        Just club ->
+            tr []
+                [ --  td []
+                  -- [ text (Club.idToString (fromJust club.id 0)) ],
+                  td []
+                    [ text (fromJust club.name "--") ]
+                , td []
+                    [ a [ href clubPath ] [ text "Edit" ] ]
 
-        -- , td []
-        --     [ button [ type_ "button", onClick (DeleteClub club.id) ]
-        --         [ text "Delete" ]
-        --     ]
-        ]
+                -- , td []
+                --     [ button [ type_ "button", onClick (DeleteClub club.id) ]
+                --         [ text "Delete" ]
+                --     ]
+                ]
+
+        Nothing ->
+            p [] [ text "No club to show" ]
 
 
 viewFetchError : String -> Html Msg

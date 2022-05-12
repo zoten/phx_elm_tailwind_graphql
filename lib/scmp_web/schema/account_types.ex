@@ -4,12 +4,20 @@ defmodule ScmpWeb.Schema.AccountTypes do
   import Absinthe.Resolution.Helpers, only: [dataloader: 1]
   import_types(Absinthe.Type.Custom)
 
+  alias Scmp.Clubs
+
   # GraphQL "object type"
   object :club do
     # Field: a bit of queriable information
     field :id, :id
     field :name, :string
     field :users, list_of(:user), resolve: dataloader(User)
+
+    field :users_count, :integer,
+      resolve: fn parent, _field, _resolution ->
+        # parent is a %Scmp.Accounts.Club{} struct here
+        Clubs.count_users(parent.id)
+      end
   end
 
   object :user do

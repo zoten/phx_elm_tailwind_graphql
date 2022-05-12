@@ -2,6 +2,7 @@ defmodule Scmp.Accounts.Club do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query, only: [from: 2]
+  import Ecto, only: [assoc: 2]
 
   alias Scmp.Repo
   alias __MODULE__
@@ -14,6 +15,8 @@ defmodule Scmp.Accounts.Club do
 
     timestamps()
   end
+
+  @type t :: %Club{}
 
   @moduledoc """
   Get all Clubs
@@ -33,5 +36,12 @@ defmodule Scmp.Accounts.Club do
     club
     |> cast(attrs, [:name, :metadata])
     |> validate_required([:name, :metadata])
+  end
+
+  @doc false
+  def count_users(id) do
+    # Could be a direct query on users_clubs but have to find how
+    # to express it better in ecto
+    Club |> Repo.get(id) |> assoc(:users) |> Repo.aggregate(:count, :id)
   end
 end

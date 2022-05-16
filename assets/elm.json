@@ -22,6 +22,7 @@
             "prikhi/decimal": "2.0.0"
         },
         "indirect": {
+            "avh4/elm-color": "1.0.0",
             "cmditch/elm-bigint": "1.0.1",
             "elm/bytes": "1.0.8",
             "elm/file": "1.0.5",

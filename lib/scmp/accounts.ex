@@ -24,7 +24,7 @@ defmodule Scmp.Accounts do
   @doc """
   Gets a single club.
 
-  Raises `Ecto.NoResultsError` if the Club does not exist.
+  Raises `Ecto.NoResultsError` if the User does not exist.
 
   ## Examples
 
@@ -35,7 +35,20 @@ defmodule Scmp.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_club!(id), do: Repo.get!(Club, id)
+  def get_club!(id) do
+    case get_club(id) do
+      {:ok, user} -> user
+      _ -> raise "Club [#{inspect(id)}] not found"
+    end
+  end
+
+  @doc """
+  Gets a single club.
+
+  Returns {:ok, %Club{}} or {:error, :not_found}
+
+  """
+  def get_club(id), do: Scmp.Accounts.Club.get_by_id(id)
 
   @doc """
   Creates a club.

@@ -34,3 +34,8 @@ users :
     -> SelectionSet (Maybe (List (Maybe decodesTo))) API.Scmp.Object.Club
 users object____ =
     Object.selectionForCompositeField "users" [] object____ (Basics.identity >> Decode.nullable >> Decode.list >> Decode.nullable)
+
+
+usersCount : SelectionSet (Maybe Int) API.Scmp.Object.Club
+usersCount =
+    Object.selectionForField "(Maybe Int)" "usersCount" [] (Decode.int |> Decode.nullable)

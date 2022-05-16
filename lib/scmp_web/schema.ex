@@ -9,6 +9,12 @@ defmodule ScmpWeb.Schema do
       resolve(&ScmpWeb.Resolvers.Accounts.Club.list_clubs/3)
     end
 
+    @desc "Get a club"
+    field :club, :club do
+      arg(:id, non_null(:id))
+      resolve(&ScmpWeb.Resolvers.Accounts.Club.find_club/3)
+    end
+
     @desc "Get a user"
     field :user, :user do
       arg(:id, non_null(:id))

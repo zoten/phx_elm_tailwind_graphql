@@ -44,4 +44,12 @@ defmodule Scmp.Accounts.Club do
     # to express it better in ecto
     Club |> Repo.get(id) |> assoc(:users) |> Repo.aggregate(:count, :id)
   end
+
+  @doc false
+  def get_by_id(id) do
+    case Repo.get(Club, id) do
+      nil -> {:error, :not_found}
+      %Club{} = club -> {:ok, club}
+    end
+  end
 end

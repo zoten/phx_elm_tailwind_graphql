@@ -19,6 +19,20 @@ import Graphql.SelectionSet exposing (SelectionSet)
 import Json.Decode as Decode exposing (Decoder)
 
 
+type alias ClubRequiredArguments =
+    { id : API.CustomCodecs.Id }
+
+
+{-| Get a club
+-}
+club :
+    ClubRequiredArguments
+    -> SelectionSet decodesTo API.Scmp.Object.Club
+    -> SelectionSet (Maybe decodesTo) RootQuery
+club requiredArgs____ object____ =
+    Object.selectionForCompositeField "club" [ Argument.required "id" requiredArgs____.id (API.CustomCodecs.codecs |> API.Scmp.Scalar.unwrapEncoder .codecId) ] object____ (Basics.identity >> Decode.nullable)
+
+
 {-| Get a list of all clubs
 -}
 clubs :

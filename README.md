@@ -138,3 +138,5 @@ Since this is an example project, there are a few notable milestones in building
 
  - [ ] check if production build is working 😶
  - [ ] get rid of self generated assets/css/app.css file 🤨
+ - [ ] modularize "hand-crafted" and repeated tailwind class chains
+ - [ ] "extract" a base layout

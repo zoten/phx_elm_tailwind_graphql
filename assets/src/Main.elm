@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
+import Page.EditClub as EditClub
 import Page.EditPost as EditPost
 import Page.ListClubs as ListClubs
 import Page.ListPosts as ListPosts
@@ -36,6 +37,7 @@ type Page
     | EditPage EditPost.Model
     | NewPage NewPost.Model
     | ListClubsPage ListClubs.Model
+    | EditClubPage EditClub.Model
 
 
 
@@ -50,6 +52,7 @@ type Msg
     | UrlChanged Url
     | EditPageMsg EditPost.Msg
     | NewPageMsg NewPost.Msg
+    | EditClubPageMsg EditClub.Msg
 
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -99,6 +102,13 @@ initCurrentPage ( model, existingCmds ) =
                             ListClubs.init
                     in
                     ( ListClubsPage clubModel, Cmd.map ListClubsPageMsg pageCmds )
+
+                Route.Club clubId ->
+                    let
+                        ( pageModel, clubCmd ) =
+                            EditClub.init clubId model.navKey
+                    in
+                    ( EditClubPage pageModel, Cmd.map EditClubPageMsg clubCmd )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -133,6 +143,10 @@ currentView model =
         ListClubsPage pageModel ->
             ListClubs.view pageModel
                 |> Html.map ListClubsPageMsg
+
+        EditClubPage pageModel ->
+            EditClub.view pageModel
+                |> Html.map EditClubPageMsg
 
 
 notFoundView : Html msg
@@ -197,6 +211,15 @@ update msg model =
             in
             ( { model | page = ListClubsPage updatedPageModel }
             , Cmd.map ListClubsPageMsg updatedCmd
+            )
+
+        ( EditClubPageMsg subMsg, EditClubPage clubPageModel ) ->
+            let
+                ( updatedClubPageModel, updatedCmd ) =
+                    EditClub.update subMsg clubPageModel
+            in
+            ( { model | page = EditClubPage updatedClubPageModel }
+            , Cmd.map EditClubPageMsg updatedCmd
             )
 
         ( _, _ ) ->

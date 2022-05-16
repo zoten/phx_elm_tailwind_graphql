@@ -12,7 +12,7 @@ import Graphql.Http
 import Graphql.Http.GraphqlError
 import Graphql.Operation exposing (RootQuery)
 import Graphql.SelectionSet as SelectionSet exposing (SelectionSet)
-import Html exposing (..)
+import Html exposing (Html, a, br, button, div, h1, h3, p, table, td, text, th, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import RemoteData exposing (RemoteData, WebData)
@@ -27,6 +27,7 @@ type alias Model =
 type alias Club =
     { id : Maybe Id
     , name : Maybe String
+    , usersCount : Maybe Int
     }
 
 
@@ -63,9 +64,10 @@ fetchClubsQuery =
 
 clubListSelection : SelectionSet Club API.Scmp.Object.Club
 clubListSelection =
-    SelectionSet.map2 Club
+    SelectionSet.map3 Club
         API.Scmp.Object.Club.id
         API.Scmp.Object.Club.name
+        API.Scmp.Object.Club.usersCount
 
 
 makeGraphQLQuery : SelectionSet decodesTo RootQuery -> (Result (Graphql.Http.Error decodesTo) decodesTo -> msg) -> Cmd msg
@@ -133,15 +135,28 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ button [ onClick FetchClubs ]
-            [ text "Refresh clubs" ]
+    div [ class "grid m-4 gap-4" ]
+        [ div [ class "col-auto" ]
+            [ div [ class "row-auto" ]
+                [ h1 [ class "flex justify-center font-bold text-4xl text-yellow-500" ]
+                    [ text "Scmp + Tailwind" ]
+                ]
+            ]
         , br [] []
         , br [] []
-        , a [ href "/clubs/new" ]
-            [ text "Create new club" ]
+        , div [ class "col-auto" ]
+            [ div [ class "row-auto" ]
+                [ a [ href "/clubs/new" ]
+                    [ text "Create new club" ]
+                ]
+            ]
         , viewClubs model.clubs
         , viewDeleteError model.deleteError
+        , button
+            [ class "px-4 py-2 font-semibold text-sm bg-cyan-500 text-white rounded-full shadow-sm"
+            , onClick FetchClubs
+            ]
+            [ text "Refresh clubs" ]
         ]
 
 
@@ -166,7 +181,7 @@ viewClubs clubsResponse =
             in
             div []
                 [ h3 [] [ text "Clubs" ]
-                , table []
+                , table [ class "table-fixed text-left min-w-full divide-y divide-gray-200 dark:divide-gray-700" ]
                     content
                 ]
 
@@ -183,6 +198,8 @@ viewTableHeader =
             [ text "ID" ]
         , th []
             [ text "Name" ]
+        , th []
+            [ text "Users" ]
         ]
 
 
@@ -198,20 +215,26 @@ getClubId clubId =
 
 viewClub : Maybe Club -> Html Msg
 viewClub maybeclub =
-    let
-        clubPath =
-            --"/clubs/" ++ Club.idToString (fromJust club.id (Id 0))
-            "/clubs/fixme"
-    in
     case maybeclub of
         Just club ->
+            let
+                clubPath =
+                    --"/clubs/" ++ Club.idToString (fromJust club.id (Id 0))
+                    "/clubs/" ++ getClubId club.id
+            in
             tr []
                 [ td []
                     [ text (getClubId club.id) ]
                 , td []
                     [ text (Maybe.withDefault "--" club.name) ]
                 , td []
-                    [ a [ href clubPath ] [ text "Edit" ] ]
+                    [ text (String.fromInt (Maybe.withDefault 0 club.usersCount)) ]
+                , td []
+                    [ a [ href clubPath ]
+                        [ button [ class "px-4 py-2 font-semibold text-sm bg-cyan-500 text-white rounded-full shadow-sm" ]
+                            [ text "Edit" ]
+                        ]
+                    ]
 
                 -- , td []
                 --     [ button [ type_ "button", onClick (DeleteClub club.id) ]

@@ -35,7 +35,7 @@ defmodule Scmp.Accounts.Club do
   def changeset(club, attrs) do
     club
     |> cast(attrs, [:name, :metadata])
-    |> validate_required([:name, :metadata])
+    |> validate_required([:name])
   end
 
   @doc false

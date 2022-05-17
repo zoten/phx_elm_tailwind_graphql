@@ -7,6 +7,7 @@ defmodule Scmp.Accounts do
   alias Scmp.Repo
 
   alias Scmp.Accounts.Club
+  alias Scmp.Accounts.User
 
   @doc """
   Returns the list of clubs.
@@ -115,7 +116,12 @@ defmodule Scmp.Accounts do
     Club.changeset(club, attrs)
   end
 
-  alias Scmp.Accounts.User
+  def add_user_to_club(club_id, user_id) do
+    with {:ok, %Club{} = _club} <- get_club(club_id),
+         {:ok, %User{} = _user} <- get_user(user_id) do
+      Scmp.Accounts.UsersClubs.add(club_id, user_id)
+    end
+  end
 
   @doc """
   Returns the list of users.

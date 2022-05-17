@@ -6,9 +6,11 @@ Showcase to see how Elixir+Phoenix, Elm, GraphQL and TailwindCSS may (opinionate
 
 ## Disclaimer
 
- * This is not for any production use.
+ * This is not for any use if not "oh, this two-lines code snippet is what I need"
  * I know really few about build pipelines for the modern web. There are surely way better ways to do the frontend stitching
  * dev port is hardcoded to 4000. This number is hardcoded in the web app and in some dev scripts. Forwarding of this port's configuration is left as an exercise to the reader (aka I'm lazy and this is out of scope, please free your port 4000 before running stuff here :) )
+ * This stuff is not following any good practice (architectural, code separation, contexts, boundaries etc). Just meant to show stuff.
+ * No error handling, unless I was testing error handling on some resource/case
 
 ### Opinionated disclaimer
 
@@ -133,6 +135,69 @@ Since this is an example project, there are a few notable milestones in building
   - Add DartSass support (to support nested styles) [source post](https://pragmaticstudio.com/tutorials/adding-tailwind-css-to-phoenix)
     - Make the CSS creation a two step pipeline (SASS + Tailwind)
     - Unluckily, need to add a `mix setup` call before first run, otherwise a needed file will not be found
+
+## Useful GraphQL queries
+
+Examples to test in graphiql (at http://localhost:4000/graphiql) or to load/check data
+
+### Query
+
+#### Fetch clubs information
+
+``` graphql
+{
+  clubs {
+    id
+    name
+    usersCount
+  }
+}
+```
+
+#### Fetch club information
+
+``` graphql
+{
+  club(id:2){
+    name,
+    users
+  }
+}
+```
+
+### Mutations
+
+#### Create Club
+
+``` graphql
+mutation CreateClub {
+  createClub(name: "Club5") {
+    id
+    name
+  }
+}
+```
+
+#### Create User
+
+``` graphql
+mutation CreateUser {
+  createUser(name: "User19") {
+    id
+    name
+  }
+}
+```
+
+#### Add User to club via id
+
+``` graphql
+mutation AddUserToClub {
+  addUserToClub(club_id: 1, user_id: 3) {
+    outcome
+  }
+}
+```
 
 ## TODO
 

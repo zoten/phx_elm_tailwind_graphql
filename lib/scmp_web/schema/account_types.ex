@@ -25,4 +25,8 @@ defmodule ScmpWeb.Schema.AccountTypes do
     field :name, :string
     field :inserted_at, :naive_datetime
   end
+
+  object :add_user_to_club_response do
+    field :outcome, :boolean
+  end
 end

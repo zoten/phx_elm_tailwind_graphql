@@ -28,6 +28,6 @@ defmodule Scmp.Accounts.User do
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:name, :groups, :metadata])
-    |> validate_required([:name, :groups, :metadata])
+    |> validate_required([:name])
   end
 end

@@ -22,6 +22,30 @@ defmodule ScmpWeb.Schema do
     end
   end
 
+  mutation do
+    @desc "Create Club"
+    field :create_club, type: :club do
+      arg(:name, non_null(:string))
+
+      resolve(&ScmpWeb.Resolvers.Accounts.Club.create_club/3)
+    end
+
+    @desc "Create User"
+    field :create_user, type: :user do
+      arg(:name, non_null(:string))
+
+      resolve(&ScmpWeb.Resolvers.Accounts.User.create_user/3)
+    end
+
+    @desc "Add user to Club"
+    field :add_user_to_club, type: :add_user_to_club_response do
+      arg(:club_id, non_null(:id))
+      arg(:user_id, non_null(:id))
+
+      resolve(&ScmpWeb.Resolvers.Accounts.Club.add_user/3)
+    end
+  end
+
   # The context/1 function is a callback specified by the Absinthe.Schema
   # behaviour that gives the schema itself an opportunity to set some values
   # in the context that it may need in order to run.

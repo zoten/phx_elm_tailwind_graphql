@@ -12,4 +12,8 @@ defmodule ScmpWeb.Resolvers.Accounts.User do
         {:ok, user}
     end
   end
+
+  def create_user(_parent, %{name: name} = _args, _resolution) do
+    Scmp.Accounts.create_user(%{name: name})
+  end
 end

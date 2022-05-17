@@ -15,11 +15,16 @@ defmodule Scmp.Accounts.UsersClubs do
   @type t :: %UsersClubs{}
 
   def add(club_id, user_id) do
-    IO.inspect([club_id, user_id])
-
     %UsersClubs{}
     |> changeset(%{club_id: club_id, user_id: user_id})
     |> Repo.insert()
+  end
+
+  def delete(club_id, user_id) do
+    case Repo.get_by(UsersClubs, club_id: club_id, user_id: user_id) do
+      nil -> {:error, :not_found}
+      something -> Repo.delete(something)
+    end
   end
 
   @doc false

@@ -123,6 +123,10 @@ defmodule Scmp.Accounts do
     end
   end
 
+  def delete_user_from_club(club_id, user_id) do
+    Scmp.Accounts.UsersClubs.delete(club_id, user_id)
+  end
+
   @doc """
   Returns the list of users.
 

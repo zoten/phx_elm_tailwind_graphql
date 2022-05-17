@@ -199,6 +199,16 @@ mutation AddUserToClub {
 }
 ```
 
+#### Delete User from club via id
+
+``` graphql
+mutation DeleteUserFromClub {
+  deleteUserFromClub(club_id: 4, user_id: 3) {
+    outcome
+  }
+}
+```
+
 ## TODO
 
  - [ ] check if production build is working 😶

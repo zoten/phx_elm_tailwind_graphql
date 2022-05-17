@@ -44,6 +44,14 @@ defmodule ScmpWeb.Schema do
 
       resolve(&ScmpWeb.Resolvers.Accounts.Club.add_user/3)
     end
+
+    @desc "Delete user from Club"
+    field :delete_user_from_club, type: :delete_user_from_club_response do
+      arg(:club_id, non_null(:id))
+      arg(:user_id, non_null(:id))
+
+      resolve(&ScmpWeb.Resolvers.Accounts.Club.delete_user/3)
+    end
   end
 
   # The context/1 function is a callback specified by the Absinthe.Schema

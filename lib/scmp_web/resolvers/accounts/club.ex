@@ -28,4 +28,11 @@ defmodule ScmpWeb.Resolvers.Accounts.Club do
       error -> error
     end
   end
+
+  def delete_user(_parent, %{club_id: club_id, user_id: user_id} = _args, _resolution) do
+    case Scmp.Accounts.delete_user_from_club(club_id, user_id) do
+      :ok -> {:ok, %{outcome: true}}
+      error -> error
+    end
+  end
 end

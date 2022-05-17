@@ -29,4 +29,8 @@ defmodule ScmpWeb.Schema.AccountTypes do
   object :add_user_to_club_response do
     field :outcome, :boolean
   end
+
+  object :delete_user_from_club_response do
+    field :outcome, :boolean
+  end
 end

@@ -1,11 +1,12 @@
 module Page.EditClub exposing (Model, Msg, init, update, view)
 
+--import Club exposing (Club, ClubId(..), clubDecoder, clubEncoder)
+
 import API.Scmp.Object
-import API.Scmp.Object.Club
+import API.Scmp.Object.Club as Club
 import API.Scmp.Query as Query
 import API.Scmp.Scalar exposing (Id(..))
 import Browser.Navigation as Nav
-import Club exposing (Club, ClubId(..), clubDecoder, clubEncoder)
 import Graphql.Http
 import Graphql.Operation exposing (RootQuery)
 import Graphql.SelectionSet as SelectionSet exposing (SelectionSet)
@@ -18,22 +19,28 @@ import RemoteData exposing (RemoteData)
 
 type alias Model =
     { navKey : Nav.Key
-    , club : RemoteData (Graphql.Http.Error Club) Club
-    , clubId : ClubId
+    , club : RemoteData (Graphql.Http.Error (Maybe ClubData)) (Maybe ClubData)
+    , clubId : Id
     , saveError : Maybe String
     , deleteError : Maybe String
     }
 
 
-type alias Club =
+type alias ClubData =
     { id : Maybe Id
     , name : Maybe String
     }
 
 
+
+-- query : SelectionSet (Maybe ClubData) RootQuery
+-- query =
+--     Query.club { id = Id "2" } clubSelection
+
+
 type Msg
     = FetchClub
-    | ClubReceived (RemoteData (Graphql.Http.Error Club) Club)
+    | ClubReceived (RemoteData (Graphql.Http.Error (Maybe ClubData)) (Maybe ClubData))
 
 
 
@@ -41,13 +48,16 @@ type Msg
 -- | UserAdded (Result Http.Error Club)
 
 
-init : ClubId -> Nav.Key -> ( Model, Cmd Msg )
+init : Id -> Nav.Key -> ( Model, Cmd Msg )
 init clubId navKey =
-    --( initialModel clubId navKey, fetchClub clubId )
-    ( initialModel clubId navKey, Cmd.none )
+    ( initialModel clubId navKey, fetchClub clubId )
 
 
-initialModel : ClubId -> Nav.Key -> Model
+
+--( initialModel clubId navKey, Cmd.none )
+
+
+initialModel : Id -> Nav.Key -> Model
 initialModel clubId navKey =
     { navKey = navKey
     , club = RemoteData.Loading
@@ -57,23 +67,37 @@ initialModel clubId navKey =
     }
 
 
+fetchClubQuery : Query.ClubRequiredArguments -> SelectionSet (Maybe ClubData) RootQuery
+fetchClubQuery id =
+    Query.club id clubSelection
 
--- fetchClubQuery : Query.ClubRequiredArguments -> SelectionSet (Maybe Club) RootQuery
--- fetchClubQuery id =
---     Query.club id clubListSelection
+
+
 -- clubListSelection : SelectionSet Club API.Scmp.Object.Club
 -- clubListSelection =
 --     SelectionSet.map2 Club
 --         API.Scmp.Object.Club.id
 --         API.Scmp.Object.Club.name
--- makeGraphQLQuery : SelectionSet decodesTo RootQuery -> (Result (Graphql.Http.Error decodesTo) decodesTo -> msg) -> Cmd msg
--- makeGraphQLQuery query decodesTo =
---     query
---         |> Graphql.Http.queryRequest "http://localhost:4000/api"
---         |> Graphql.Http.send decodesTo
--- fetchClub : ClubId -> Cmd Msg
--- fetchClub _ =
---     Debug.todo "TODO" ClubReceived
+
+
+clubSelection : SelectionSet ClubData API.Scmp.Object.Club
+clubSelection =
+    SelectionSet.map2 ClubData
+        Club.id
+        Club.name
+
+
+makeGraphQLQuery : SelectionSet decodesTo RootQuery -> (Result (Graphql.Http.Error decodesTo) decodesTo -> msg) -> Cmd msg
+makeGraphQLQuery query decodesTo =
+    query
+        |> Graphql.Http.queryRequest "http://localhost:4000/api"
+        |> Graphql.Http.send decodesTo
+
+
+fetchClub : Id -> Cmd Msg
+fetchClub id =
+    makeGraphQLQuery (fetchClubQuery { id = id })
+        (RemoteData.fromResult >> ClubReceived)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -87,11 +111,78 @@ update msg model =
             ( { model | club = response }, Cmd.none )
 
 
+getClubId : Id -> String
+getClubId clubId =
+    case clubId of
+        Id id ->
+            id
+
+
 view : Model -> Html Msg
 view model =
     div [ class "grid m-4 gap-4" ]
-        [ text ("id is " ++ Club.idToString model.clubId)
+        [ text ("id is " ++ getClubId model.clubId)
+        , viewClub model.club
         ]
+
+
+viewClub : RemoteData (Graphql.Http.Error (Maybe ClubData)) (Maybe ClubData) -> Html Msg
+viewClub clubResponse =
+    case clubResponse of
+        RemoteData.NotAsked ->
+            text ""
+
+        RemoteData.Loading ->
+            h3 [] [ text "Loading..." ]
+
+        RemoteData.Success actualClub ->
+            let
+                content =
+                    case actualClub of
+                        Just club ->
+                            [ viewClubHeader club, viewClubData club ]
+
+                        Nothing ->
+                            [ p [] [ text "Nothing to show :(" ] ]
+            in
+            div []
+                [ h3 [] [ text "Club " ]
+                , div [] content
+                ]
+
+        RemoteData.Failure _ ->
+            viewFetchError "HTTP Error"
+
+
+viewFetchError : String -> Html Msg
+viewFetchError errorMessage =
+    let
+        errorHeading =
+            "Couldn't fetch clubs at this time."
+    in
+    div []
+        [ h3 [] [ text errorHeading ]
+        , text ("Error: " ++ errorMessage)
+        ]
+
+
+viewClubHeader : ClubData -> Html Msg
+viewClubHeader club =
+    let
+        name =
+            case club.name of
+                Just value ->
+                    value
+
+                Nothing ->
+                    "(noname)"
+    in
+    h1 [] [ text ("Club Header: " ++ name) ]
+
+
+viewClubData : ClubData -> Html Msg
+viewClubData _ =
+    h1 [] [ text "club" ]
 
 
 

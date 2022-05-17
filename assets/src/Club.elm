@@ -8,8 +8,10 @@ module Club exposing
     , idParser
     , idToString
     , newClubEncoder
+    , scalarIdParser
     )
 
+import API.Scmp.Scalar exposing (Id(..))
 import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
@@ -53,6 +55,13 @@ idParser =
     custom "CLUBID" <|
         \clubId ->
             Maybe.map ClubId (String.toInt clubId)
+
+
+scalarIdParser : Parser (Id -> a) a
+scalarIdParser =
+    custom "CLUBID" <|
+        \clubId ->
+            Just (Id clubId)
 
 
 clubEncoder : Club -> Encode.Value

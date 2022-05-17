@@ -1,7 +1,10 @@
 module Route exposing (Route(..), parseUrl, pushUrl)
 
+--import Club exposing (ClubId)
+
+import API.Scmp.Scalar exposing (Id(..))
 import Browser.Navigation as Nav
-import Club exposing (ClubId)
+import Club exposing (scalarIdParser)
 import Post exposing (PostId)
 import Url exposing (Url)
 import Url.Parser exposing (..)
@@ -13,7 +16,7 @@ type Route
     | Post PostId
     | NewPost
     | Clubs
-    | Club ClubId
+    | Club Id
 
 
 parseUrl : Url -> Route
@@ -34,7 +37,7 @@ matchRoute =
         , map Post (s "posts" </> Post.idParser)
         , map NewPost (s "posts" </> s "new")
         , map Clubs (s "clubs")
-        , map Club (s "clubs" </> Club.idParser)
+        , map Club (s "clubs" </> scalarIdParser)
         ]
 
 
@@ -63,4 +66,10 @@ routeToString route =
             "/clubs"
 
         Club clubId ->
-            "/clubs/" ++ Club.idToString clubId
+            let
+                clubIdStr =
+                    case clubId of
+                        Id value ->
+                            value
+            in
+            "/clubs/" ++ clubIdStr

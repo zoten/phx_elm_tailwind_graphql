@@ -4,6 +4,7 @@ module Page.EditClub exposing (Model, Msg, init, update, view)
 
 import API.Scmp.Object
 import API.Scmp.Object.Club as Club
+import API.Scmp.Object.User as User exposing (..)
 import API.Scmp.Query as Query
 import API.Scmp.Scalar exposing (Id(..))
 import Browser.Navigation as Nav
@@ -26,9 +27,16 @@ type alias Model =
     }
 
 
+type alias UserData =
+    { id : Maybe Id
+    , name : Maybe String
+    }
+
+
 type alias ClubData =
     { id : Maybe Id
     , name : Maybe String
+    , users : Maybe (List (Maybe UserData))
     }
 
 
@@ -82,9 +90,10 @@ fetchClubQuery id =
 
 clubSelection : SelectionSet ClubData API.Scmp.Object.Club
 clubSelection =
-    SelectionSet.map2 ClubData
+    SelectionSet.map3 ClubData
         Club.id
         Club.name
+        (Club.users (SelectionSet.map2 UserData User.id User.name))
 
 
 makeGraphQLQuery : SelectionSet decodesTo RootQuery -> (Result (Graphql.Http.Error decodesTo) decodesTo -> msg) -> Cmd msg
@@ -181,8 +190,31 @@ viewClubHeader club =
 
 
 viewClubData : ClubData -> Html Msg
-viewClubData _ =
-    h1 [] [ text "club" ]
+viewClubData model =
+    div []
+        [ h1 [] [ text "club" ]
+        , div [] (viewClubUsersData model.users)
+        ]
+
+
+viewClubUsersData : Maybe (List (Maybe UserData)) -> List (Html Msg)
+viewClubUsersData users =
+    case users of
+        Just actualUsers ->
+            List.map viewUser actualUsers
+
+        Nothing ->
+            [ div [] [ text "No users for this club" ] ]
+
+
+viewUser : Maybe UserData -> Html Msg
+viewUser userData =
+    case userData of
+        Just actualUser ->
+            div [] [ text (Maybe.withDefault "--" actualUser.name) ]
+
+        Nothing ->
+            div [] [ text "no user" ]
 
 
 

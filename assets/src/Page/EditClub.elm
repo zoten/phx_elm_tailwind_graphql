@@ -47,8 +47,9 @@ type alias ClubData =
 
 
 type Msg
-    = FetchClub
+    = FetchClub Id
     | ClubReceived (RemoteData (Graphql.Http.Error (Maybe ClubData)) (Maybe ClubData))
+    | DeleteUser Id
 
 
 
@@ -109,15 +110,23 @@ fetchClub id =
         (RemoteData.fromResult >> ClubReceived)
 
 
+deleteClub : Id -> Cmd Msg
+deleteClub _ =
+    Debug.todo "wut"
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        FetchClub ->
-            -- ( { model | club = RemoteData.Loading }, fetchClub )
-            ( { model | club = RemoteData.Loading }, Cmd.none )
+        FetchClub id ->
+            ( { model | club = RemoteData.Loading }, fetchClub id )
 
+        -- ( { model | club = RemoteData.Loading }, Cmd.none )
         ClubReceived response ->
             ( { model | club = response }, Cmd.none )
+
+        DeleteUser id ->
+            ( { model | club = RemoteData.Loading }, deleteClub id )
 
 
 getClubId : Id -> String
@@ -155,8 +164,7 @@ viewClub clubResponse =
                             [ p [] [ text "Nothing to show :(" ] ]
             in
             div []
-                [ h3 [] [ text "Club " ]
-                , div [] content
+                [ div [ class "grid grid-cols-4" ] content
                 ]
 
         RemoteData.Failure _ ->
@@ -185,15 +193,35 @@ viewClubHeader club =
 
                 Nothing ->
                     "(noname)"
+
+        id =
+            case club.id of
+                Just (Id value) ->
+                    value
+
+                Nothing ->
+                    "0"
     in
-    h1 [] [ text ("Club Header: " ++ name) ]
+    div [ class "flex col-span-4 justify-center font-bold text-4xl text-yellow-500" ]
+        [ h1 [] [ text ("Club: " ++ name ++ " (" ++ id ++ ")") ]
+        ]
 
 
 viewClubData : ClubData -> Html Msg
 viewClubData model =
     div []
-        [ h1 [] [ text "club" ]
-        , div [] (viewClubUsersData model.users)
+        [ div [ class "col-span-8" ]
+            [ h1 [ class "font-bold" ]
+                [ text "Club information"
+                ]
+            , button [ class "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded", onClick (FetchClub (Maybe.withDefault (Id "0") model.id)) ] [ text "refetch" ]
+            ]
+        , div []
+            [ h1 [] [ text "Users list" ]
+            , div
+                [ class "flex grid-cols-8 gap-4" ]
+                (viewClubUsersData model.users)
+            ]
         ]
 
 
@@ -211,65 +239,11 @@ viewUser : Maybe UserData -> Html Msg
 viewUser userData =
     case userData of
         Just actualUser ->
-            div [] [ text (Maybe.withDefault "--" actualUser.name) ]
+            div [ class "bg-gradient-to-r from-indigo-500 shadow-lg" ]
+                [ text (Maybe.withDefault "--" actualUser.name)
+                , button [ onClick (DeleteUser (Maybe.withDefault (Id "0") actualUser.id)), class "bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500" ]
+                    [ text "x" ]
+                ]
 
         Nothing ->
             div [] [ text "no user" ]
-
-
-
--- viewClub : RemoteData (Graphql.Http.Error Club) Club -> Html Msg
--- viewClub clubsResponse =
---     case clubsResponse of
---         RemoteData.NotAsked ->
---             text ""
---         RemoteData.Loading ->
---             h3 [] [ text "Loading..." ]
---         RemoteData.Success actualClub ->
---             let
---                 content =
---                     case actualClub of
---                         Just club ->
---                             viewTableHeader :: List.map viewClub club
---                         Nothing ->
---                             [ p [] [ text "Nothing to show" ] ]
---             in
---             div []
---                 [ h3 [] [ text "Clubs" ]
---                 , table [ class "table-fixed text-left min-w-full divide-y divide-gray-200 dark:divide-gray-700" ]
---                     content
---                 ]
---         --RemoteData.Failure httpError ->
---         --viewFetchError (buildErrorMessage httpError)
---         RemoteData.Failure _ ->
---             viewFetchError "HTTP Error"
--- viewTableHeader : Html Msg
--- viewTableHeader =
---     tr []
---         [ th []
---             [ text "ID" ]
---         , th []
---             [ text "Name" ]
---         , th []
---             [ text "Users" ]
---         ]
--- viewFetchError : String -> Html Msg
--- viewFetchError errorMessage =
---     let
---         errorHeading =
---             "Couldn't fetch club at this time."
---     in
---     div []
---         [ h3 [] [ text errorHeading ]
---         , text ("Error: " ++ errorMessage)
---         ]
--- viewDeleteError : Maybe String -> Html msg
--- viewDeleteError maybeError =
---     case maybeError of
---         Just error ->
---             div []
---                 [ h3 [] [ text "Couldn't delete club at this time." ]
---                 , text ("Error: " ++ error)
---                 ]
---         Nothing ->
---             text ""

@@ -5,8 +5,16 @@
 module API.Scmp.Object exposing (..)
 
 
+type AddUserToClubResponse
+    = AddUserToClubResponse
+
+
 type Club
     = Club
+
+
+type DeleteUserFromClubResponse
+    = DeleteUserFromClubResponse
 
 
 type User

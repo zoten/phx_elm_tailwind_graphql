@@ -21,17 +21,6 @@ defmodule ScmpWeb.Router do
           schema: ScmpWeb.Schema,
           interface: :simple
 
-  scope "/", ScmpWeb do
-    pipe_through :browser
-
-    get "/", PageController, :index
-  end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", ScmpWeb do
-  #   pipe_through :api
-  # end
-
   # Enables LiveDashboard only for development
   #
   # If you want to use the LiveDashboard in production, you should put
@@ -59,5 +48,12 @@ defmodule ScmpWeb.Router do
 
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  # Catch all
+  scope "/", ScmpWeb do
+    pipe_through :browser
+
+    get "*path", PageController, :index
   end
 end

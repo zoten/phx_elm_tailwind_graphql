@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Page.EditClub as EditClub
 import Page.EditPost as EditPost
 import Page.ListClubs as ListClubs
@@ -118,8 +119,34 @@ initCurrentPage ( model, existingCmds ) =
 view : Model -> Document Msg
 view model =
     { title = "Scmp App"
-    , body = [ currentView model ]
+    , body = [ templateView (currentView model) ]
     }
+
+
+templateView : Html Msg -> Html Msg
+templateView content =
+    div []
+        [ div [ class "container mx-auto" ]
+            [ div [ class "flex flex-row flex-wrap py-4" ]
+                [ aside [ class "w-full sm:w-1/3 md:w-1/4 px-2 bg-gradient-to-b from-slate-400 to-slate-100" ]
+                    [ ul [ class "flex sm:flex-col overflow-hidden content-center justify-between list-none hover:list-disc" ]
+                        [ li [] [ a [ href "/" ] [ text "Home" ] ]
+                        , li [] [ text "hey" ]
+                        , li [] [ text "man" ]
+                        , li [] [ text "this is" ]
+                        , li [] [ text "a sidebar" ]
+                        ]
+                    ]
+                , main_ [ class "w-full sm:w-2/3 md:w-3/4 pt-1 px-2" ]
+                    [ content
+                    ]
+                ]
+            ]
+        , div [ class "mt-auto" ]
+            [ div [ class "container mx-auto bg-gradient-to-r from-slate-100 to-slate-400" ]
+                [ text "footer" ]
+            ]
+        ]
 
 
 currentView : Model -> Html Msg

@@ -214,4 +214,6 @@ mutation DeleteUserFromClub {
  - [ ] check if production build is working 😶
  - [ ] get rid of self generated assets/css/app.css file 🤨
  - [ ] modularize "hand-crafted" and repeated tailwind class chains
- - [ ] "extract" a base layout
+ - [x] "extract" a base layout
+   - [ ] do it well
+ - [ ] check that the final css is stripped (not MB of unused stuff :) )

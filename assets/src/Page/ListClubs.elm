@@ -181,7 +181,7 @@ viewClubs clubsResponse =
             in
             div []
                 [ h3 [] [ text "Clubs" ]
-                , table [ class "table-fixed text-left min-w-full divide-y divide-gray-200 dark:divide-gray-700" ]
+                , table [ class "table-auto text-left min-w-full divide-y divide-gray-200 dark:divide-gray-700" ]
                     content
                 ]
 

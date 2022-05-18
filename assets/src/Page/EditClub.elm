@@ -163,9 +163,9 @@ update msg model =
             ( { model | club = RemoteData.Loading }, fetchClub model.clubId )
 
 
-getClubId : Id -> String
-getClubId clubId =
-    case clubId of
+strFromId : Id -> String
+strFromId theId =
+    case theId of
         Id id ->
             id
 
@@ -173,8 +173,8 @@ getClubId clubId =
 view : Model -> Html Msg
 view model =
     div [ class "grid m-4 gap-4" ]
-        [ text ("id is " ++ getClubId model.clubId)
-        , viewClub model.club
+        [ --text ("id is " ++ getClubId model.clubId)
+          viewClub model.club
         ]
 
 
@@ -246,9 +246,9 @@ viewClubData model =
     div []
         [ div [ class "col-span-8" ]
             [ h1 [ class "font-bold" ]
-                [ text "Club information"
+                [ text "Club information "
+                , button [ class "px-4 py-2 font-semibold text-sm bg-cyan-500 text-white rounded-full shadow-sm", onClick (FetchClub (Maybe.withDefault (Id "0") model.id)) ] [ text "refetch" ]
                 ]
-            , button [ class "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded", onClick (FetchClub (Maybe.withDefault (Id "0") model.id)) ] [ text "refetch" ]
             ]
         , div []
             [ h1 [] [ text "Users list" ]
@@ -273,11 +273,31 @@ viewUser : Maybe UserData -> Html Msg
 viewUser userData =
     case userData of
         Just actualUser ->
-            div [ class "bg-gradient-to-r from-indigo-500 shadow-lg" ]
-                [ text (Maybe.withDefault "--" actualUser.name)
-                , button [ onClick (DeleteUser (Maybe.withDefault (Id "0") actualUser.id)), class "bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500" ]
-                    [ text "x" ]
-                ]
+            viewCard actualUser
 
+        -- div [ class "w-24 h-12 rounded-lg bg-white shadow-md bg-gradient-to-r from-gray-500 shadow-lg rounded-full" ]
+        --     [ text (Maybe.withDefault "--" actualUser.name)
+        --     , button [ onClick (DeleteUser (Maybe.withDefault (Id "0") actualUser.id)), class "bg-gradient-to-r from-red-400 to-red-500 hover:from-pink-900 hover:to-yellow-500" ]
+        --         [ text "Delete" ]
+        --     ]
         Nothing ->
             div [] [ text "no user" ]
+
+
+viewCard : UserData -> Html Msg
+viewCard userData =
+    let
+        idValue =
+            Maybe.withDefault (Id "0") userData.id
+    in
+    div [ class "max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700" ]
+        [ div [ class "flex justify-end px-4 pt-4" ]
+            [ button [ onClick (DeleteUser idValue), type_ "button", class "hidden sm:inline-block text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5" ]
+                [ text "Delete"
+                ]
+            ]
+        , div [ class "flex flex-col items-center pb-10" ]
+            [ h5 [ class "mb-1 text-xl font-medium text-gray-900 dark:text-white" ] [ text (Maybe.withDefault "(noname)" userData.name) ]
+            , span [ class "text-sm text-gray-500 dark:text-gray-400" ] [ text ("ID: " ++ strFromId idValue) ]
+            ]
+        ]

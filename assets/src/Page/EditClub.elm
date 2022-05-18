@@ -2,14 +2,16 @@ module Page.EditClub exposing (Model, Msg, init, update, view)
 
 --import Club exposing (Club, ClubId(..), clubDecoder, clubEncoder)
 
+import API.Scmp.Mutation as Mutation
 import API.Scmp.Object
 import API.Scmp.Object.Club as Club
+import API.Scmp.Object.DeleteUserFromClubResponse
 import API.Scmp.Object.User as User exposing (..)
 import API.Scmp.Query as Query
 import API.Scmp.Scalar exposing (Id(..))
 import Browser.Navigation as Nav
 import Graphql.Http
-import Graphql.Operation exposing (RootQuery)
+import Graphql.Operation exposing (RootMutation, RootQuery)
 import Graphql.SelectionSet as SelectionSet exposing (SelectionSet)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -40,6 +42,15 @@ type alias ClubData =
     }
 
 
+type alias DeleteUserData =
+    { outcome : Maybe Bool
+    }
+
+
+type alias DeleteUserResponse =
+    Maybe DeleteUserData
+
+
 
 -- query : SelectionSet (Maybe ClubData) RootQuery
 -- query =
@@ -50,6 +61,7 @@ type Msg
     = FetchClub Id
     | ClubReceived (RemoteData (Graphql.Http.Error (Maybe ClubData)) (Maybe ClubData))
     | DeleteUser Id
+    | UserDeleted (RemoteData (Graphql.Http.Error (Maybe DeleteUserData)) (Maybe DeleteUserData))
 
 
 
@@ -110,9 +122,28 @@ fetchClub id =
         (RemoteData.fromResult >> ClubReceived)
 
 
-deleteClub : Id -> Cmd Msg
-deleteClub _ =
-    Debug.todo "wut"
+
+-- Delete user from club
+
+
+deleteUserSelection : SelectionSet DeleteUserData API.Scmp.Object.DeleteUserFromClubResponse
+deleteUserSelection =
+    SelectionSet.map DeleteUserData
+        API.Scmp.Object.DeleteUserFromClubResponse.outcome
+
+
+sendDeleteUserMutation : Id -> Id -> SelectionSet DeleteUserResponse RootMutation
+sendDeleteUserMutation club_id user_id =
+    Mutation.deleteUserFromClub
+        { clubId = club_id, userId = user_id }
+        deleteUserSelection
+
+
+deleteUserFromClub : Id -> Id -> Cmd Msg
+deleteUserFromClub clubId userId =
+    sendDeleteUserMutation clubId userId
+        |> Graphql.Http.mutationRequest "http://localhost:4000/api"
+        |> Graphql.Http.send (RemoteData.fromResult >> UserDeleted)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -125,8 +156,11 @@ update msg model =
         ClubReceived response ->
             ( { model | club = response }, Cmd.none )
 
-        DeleteUser id ->
-            ( { model | club = RemoteData.Loading }, deleteClub id )
+        DeleteUser userId ->
+            ( { model | club = RemoteData.Loading }, deleteUserFromClub model.clubId userId )
+
+        UserDeleted _ ->
+            ( { model | club = RemoteData.Loading }, fetchClub model.clubId )
 
 
 getClubId : Id -> String

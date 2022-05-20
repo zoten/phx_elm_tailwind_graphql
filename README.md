@@ -103,8 +103,7 @@ Since this is an example project, there are a few notable milestones in building
     ```
 
   - `app.js`
-    Maybe the less convincing part, it needs to require Elm and bind the application
-    to a dom element
+    require Elm and bind the application to a dom element
 
     ``` javascript
     import { Elm } from '../src/Main.elm';
@@ -216,4 +215,4 @@ mutation DeleteUserFromClub {
  - [ ] modularize "hand-crafted" and repeated tailwind class chains
  - [x] "extract" a base layout
    - [ ] do it well
- - [ ] check that the final css is stripped (not MB of unused stuff :) )
+ - [x] check that the final css is stripped (not MB of unused stuff :) )

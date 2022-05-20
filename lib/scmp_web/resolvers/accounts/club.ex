@@ -24,8 +24,11 @@ defmodule ScmpWeb.Resolvers.Accounts.Club do
 
   def add_user(_parent, %{club_id: club_id, user_id: user_id} = _args, _resolution) do
     case Scmp.Accounts.add_user_to_club(club_id, user_id) do
-      :ok -> {:ok, %{outcome: true}}
-      error -> error
+      {:ok, _} ->
+        {:ok, %{outcome: true}}
+
+      {:error, _} = error ->
+        error
     end
   end
 

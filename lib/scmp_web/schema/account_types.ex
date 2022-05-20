@@ -5,7 +5,7 @@ defmodule ScmpWeb.Schema.AccountTypes do
   import_types(Absinthe.Type.Custom)
 
   alias Scmp.Clubs
-
+  alias Scmp.Users
   # GraphQL "object type"
   object :club do
     # Field: a bit of queriable information
@@ -23,7 +23,16 @@ defmodule ScmpWeb.Schema.AccountTypes do
   object :user do
     field :id, :id
     field :name, :string
+
+    field :clubs, list_of(:club), resolve: dataloader(Club)
+
     field :inserted_at, :naive_datetime
+
+    field :clubs_count, :integer,
+      resolve: fn parent, _field, _resolution ->
+        # parent is a %Scmp.Accounts.Club{} struct here
+        Users.count_clubs(parent.id)
+      end
   end
 
   object :add_user_to_club_response do

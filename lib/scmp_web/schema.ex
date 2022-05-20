@@ -15,6 +15,11 @@ defmodule ScmpWeb.Schema do
       resolve(&ScmpWeb.Resolvers.Accounts.Club.find_club/3)
     end
 
+    @desc "Get a list of all users"
+    field :users, list_of(:user) do
+      resolve(&ScmpWeb.Resolvers.Accounts.User.list_users/3)
+    end
+
     @desc "Get a user"
     field :user, :user do
       arg(:id, non_null(:id))

@@ -1,6 +1,8 @@
 defmodule Scmp.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query, only: [from: 2]
+  import Ecto, only: [assoc: 2]
 
   alias Scmp.Repo
   alias __MODULE__
@@ -15,6 +17,26 @@ defmodule Scmp.Accounts.User do
     many_to_many :clubs, Scmp.Accounts.Club, join_through: "users_clubs"
 
     timestamps()
+  end
+
+  @moduledoc """
+  Get all Users
+  """
+  def all(opts \\ []) do
+    order_by = Keyword.get(opts, :order_by, :name)
+
+    query =
+      from u in User,
+        order_by: ^order_by
+
+    Repo.all(query)
+  end
+
+  @doc false
+  def count_users(id) do
+    # Could be a direct query on users_clubs but have to find how
+    # to express it better in ecto
+    User |> Repo.get(id) |> assoc(:clubs) |> Repo.aggregate(:count, :id)
   end
 
   def get_by_id(id) do

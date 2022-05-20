@@ -3,6 +3,11 @@ defmodule ScmpWeb.Resolvers.Accounts.User do
   GraphQL resolvers for User entities
   """
 
+  def list_users(_parent, _args, _resolution) do
+    # IO.inspect([parent, args, Map.keys(resolution)])
+    {:ok, Scmp.Users.all()}
+  end
+
   def find_user(_parent, %{id: id}, _resolution) do
     case Scmp.Accounts.get_user(id) do
       {:error, :not_found} ->

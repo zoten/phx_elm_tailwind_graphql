@@ -54,6 +54,6 @@ defmodule ScmpWeb.Router do
   scope "/", ScmpWeb do
     pipe_through :browser
 
-    get "*path", PageController, :index
+    get "/*path", PageController, :index
   end
 end

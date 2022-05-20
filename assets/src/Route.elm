@@ -17,6 +17,7 @@ type Route
     | NewPost
     | Clubs
     | Club Id
+    | NewClub
 
 
 parseUrl : Url -> Route
@@ -37,6 +38,7 @@ matchRoute =
         , map Post (s "posts" </> Post.idParser)
         , map NewPost (s "posts" </> s "new")
         , map Clubs (s "clubs")
+        , map NewClub (s "clubs" </> s "new")
         , map Club (s "clubs" </> scalarIdParser)
         ]
 
@@ -73,3 +75,6 @@ routeToString route =
                             value
             in
             "/clubs/" ++ clubIdStr
+
+        NewClub ->
+            "/clubs/new"

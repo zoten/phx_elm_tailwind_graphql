@@ -54,3 +54,12 @@ user :
     -> SelectionSet (Maybe decodesTo) RootQuery
 user requiredArgs____ object____ =
     Object.selectionForCompositeField "user" [ Argument.required "id" requiredArgs____.id (API.CustomCodecs.codecs |> API.Scmp.Scalar.unwrapEncoder .codecId) ] object____ (Basics.identity >> Decode.nullable)
+
+
+{-| Get a list of all users
+-}
+users :
+    SelectionSet decodesTo API.Scmp.Object.User
+    -> SelectionSet (Maybe (List (Maybe decodesTo))) RootQuery
+users object____ =
+    Object.selectionForCompositeField "users" [] object____ (Basics.identity >> Decode.nullable >> Decode.list >> Decode.nullable)

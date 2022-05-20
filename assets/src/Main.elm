@@ -8,6 +8,7 @@ import Page.EditClub as EditClub
 import Page.EditPost as EditPost
 import Page.ListClubs as ListClubs
 import Page.ListPosts as ListPosts
+import Page.NewClub as NewClub
 import Page.NewPost as NewPost
 import Route exposing (Route)
 import Url exposing (Url)
@@ -39,6 +40,7 @@ type Page
     | NewPage NewPost.Model
     | ListClubsPage ListClubs.Model
     | EditClubPage EditClub.Model
+    | NewClub NewClub.Model
 
 
 
@@ -54,6 +56,7 @@ type Msg
     | EditPageMsg EditPost.Msg
     | NewPageMsg NewPost.Msg
     | EditClubPageMsg EditClub.Msg
+    | NewClubPageMsg NewClub.Msg
 
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -110,6 +113,13 @@ initCurrentPage ( model, existingCmds ) =
                             EditClub.init clubId model.navKey
                     in
                     ( EditClubPage pageModel, Cmd.map EditClubPageMsg clubCmd )
+
+                Route.NewClub ->
+                    let
+                        ( pageModel, pageCmd ) =
+                            NewClub.init model.navKey
+                    in
+                    ( NewClub pageModel, Cmd.map NewClubPageMsg pageCmd )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -174,6 +184,10 @@ currentView model =
         EditClubPage pageModel ->
             EditClub.view pageModel
                 |> Html.map EditClubPageMsg
+
+        NewClub pageModel ->
+            NewClub.view pageModel
+                |> Html.map NewClubPageMsg
 
 
 notFoundView : Html msg

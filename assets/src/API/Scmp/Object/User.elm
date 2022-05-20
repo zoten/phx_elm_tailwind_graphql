@@ -19,6 +19,18 @@ import Graphql.SelectionSet exposing (SelectionSet)
 import Json.Decode as Decode
 
 
+clubs :
+    SelectionSet decodesTo API.Scmp.Object.Club
+    -> SelectionSet (Maybe (List (Maybe decodesTo))) API.Scmp.Object.User
+clubs object____ =
+    Object.selectionForCompositeField "clubs" [] object____ (Basics.identity >> Decode.nullable >> Decode.list >> Decode.nullable)
+
+
+clubsCount : SelectionSet (Maybe Int) API.Scmp.Object.User
+clubsCount =
+    Object.selectionForField "(Maybe Int)" "clubsCount" [] (Decode.int |> Decode.nullable)
+
+
 id : SelectionSet (Maybe API.CustomCodecs.Id) API.Scmp.Object.User
 id =
     Object.selectionForField "(Maybe API.CustomCodecs.Id)" "id" [] (API.CustomCodecs.codecs |> API.Scmp.Scalar.unwrapCodecs |> .codecId |> .decoder |> Decode.nullable)
